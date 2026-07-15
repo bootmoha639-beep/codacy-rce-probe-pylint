@@ -1,1 +1,1 @@
-{"tools": [{"name": "pylint", "patterns": []}]}
+{"tools": [{"name": "pylint"}]}
